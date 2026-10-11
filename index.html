@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#15372A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Schiri">
+<title>Schiri – Spielleitung</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<noscript>Diese App braucht JavaScript.</noscript>
+
+<main>
+
+  <!-- ============ SPIEL ============ -->
+  <section id="view-spiel" class="view active" aria-label="Spiel">
+    <div class="clockbox" id="clockMain">
+      <div class="period-row">
+        <span id="periodName">1. Halbzeit</span>
+        <span class="dot" id="runDot" aria-hidden="true"></span>
+      </div>
+      <div class="clock" id="clock" role="timer" aria-live="off">00:00</div>
+      <div class="clock-info">
+        <span id="clockInfo">Ende regulär 45:00</span>
+        <span class="over-pill" id="overPill" hidden>+00:00</span>
+      </div>
+    </div>
+
+    <div class="row two">
+      <button class="btn primary big" id="btnClock" data-act="toggleClock">Anpfiff</button>
+      <button class="btn big" id="btnEnd" data-act="endPeriod">Halbzeit beenden</button>
+    </div>
+    <button class="btn" id="btnFinish" data-act="finishMatch" hidden>Spiel jetzt beenden</button>
+
+    <div class="adjust">
+      <div class="adj-group">
+        <span class="adj-label">Nachspielzeit</span>
+        <button class="btn small" data-act="stop" data-v="-1" aria-label="Nachspielzeit eine Minute weniger">−</button>
+        <output id="stopVal" class="adj-val">+0</output>
+        <button class="btn small" data-act="stop" data-v="1" aria-label="Nachspielzeit eine Minute mehr">+</button>
+      </div>
+      <div class="adj-group">
+        <span class="adj-label">Uhr korrigieren</span>
+        <button class="btn small" data-act="adjust" data-v="-1">−1 Min</button>
+        <button class="btn small" data-act="adjust" data-v="1">+1 Min</button>
+      </div>
+    </div>
+
+    <div class="score" aria-label="Spielstand">
+      <div class="side">
+        <div class="team" data-tn="0">Heim</div>
+        <output class="goals" id="score0">0</output>
+        <div class="goal-btns">
+          <button class="btn small" data-act="goal" data-team="0" data-v="-1" aria-label="Tor Heim zurücknehmen">−</button>
+          <button class="btn small primary" data-act="goal" data-team="0" data-v="1">Tor</button>
+        </div>
+      </div>
+      <div class="side">
+        <div class="team" data-tn="1">Gast</div>
+        <output class="goals" id="score1">0</output>
+        <div class="goal-btns">
+          <button class="btn small" data-act="goal" data-team="1" data-v="-1" aria-label="Tor Gast zurücknehmen">−</button>
+          <button class="btn small primary" data-act="goal" data-team="1" data-v="1">Tor</button>
+        </div>
+      </div>
+    </div>
+
+    <h2>Pfeife</h2>
+    <div class="pads">
+      <button class="pad" data-sound="short"><span class="beats"><i style="--w:12px"></i></span>Kurz</button>
+      <button class="pad" data-sound="double"><span class="beats"><i style="--w:12px"></i><i style="--w:12px"></i></span>Doppel</button>
+      <button class="pad" data-sound="long"><span class="beats"><i style="--w:46px"></i></span>Lang</button>
+      <button class="pad" data-sound="triple"><span class="beats"><i style="--w:18px"></i><i style="--w:18px"></i><i style="--w:30px"></i></span>Spielende</button>
+      <button class="pad" data-sound="horn"><span class="beats"><i style="--w:40px;--h:12px"></i></span>Hupe</button>
+      <button class="pad" data-sound="beep"><span class="beats"><i style="--w:8px;--h:8px"></i><i style="--w:8px;--h:8px"></i></span>Signalton</button>
+    </div>
+  </section>
+
+  <!-- ============ KARTEN ============ -->
+  <section id="view-karten" class="view" aria-label="Karten">
+    <h2>Karte vergeben</h2>
+
+    <div class="row two" role="radiogroup" aria-label="Mannschaft">
+      <button class="btn choice" data-pick="cardTeam" data-v="0" role="radio" aria-checked="true"><span data-tn="0">Heim</span></button>
+      <button class="btn choice" data-pick="cardTeam" data-v="1" role="radio" aria-checked="false"><span data-tn="1">Gast</span></button>
+    </div>
+
+    <label class="field">
+      <span>Spieler oder Funktion</span>
+      <input id="cardNum" type="text" inputmode="numeric" maxlength="12" placeholder="Rückennummer, z. B. 7" autocomplete="off">
+    </label>
+
+    <div class="types" role="radiogroup" aria-label="Kartenart">
+      <button class="type" data-pick="cardType" data-v="yellow" role="radio" aria-checked="true"><i class="cs y"></i>Gelb</button>
+      <button class="type" data-pick="cardType" data-v="yellowred" role="radio" aria-checked="false"><i class="cs y"></i><i class="cs r second"></i>Gelb-Rot</button>
+      <button class="type" data-pick="cardType" data-v="red" role="radio" aria-checked="false"><i class="cs r"></i>Rot</button>
+    </div>
+
+    <div class="field"><span>Grund</span></div>
+    <div class="chips" id="reasonChips"></div>
+
+    <button class="btn primary big" data-act="giveCard">Karte zeigen</button>
+
+    <h2>Verwarnt und vom Platz gestellt</h2>
+    <div id="cardSummary" class="summary"></div>
+  </section>
+
+  <!-- ============ WECHSEL ============ -->
+  <section id="view-wechsel" class="view" aria-label="Wechsel">
+    <h2>Auswechslung</h2>
+    <div class="row two" role="radiogroup" aria-label="Mannschaft">
+      <button class="btn choice" data-pick="subTeam" data-v="0" role="radio" aria-checked="true"><span data-tn="0">Heim</span></button>
+      <button class="btn choice" data-pick="subTeam" data-v="1" role="radio" aria-checked="false"><span data-tn="1">Gast</span></button>
+    </div>
+    <div class="row two">
+      <label class="field"><span>Raus</span><input id="subOut" type="text" inputmode="numeric" maxlength="3" placeholder="Nr." autocomplete="off"></label>
+      <label class="field"><span>Rein</span><input id="subIn" type="text" inputmode="numeric" maxlength="3" placeholder="Nr." autocomplete="off"></label>
+    </div>
+    <button class="btn primary big" data-act="doSub">Wechsel eintragen</button>
+    <div class="summary" id="subSummary"></div>
+  </section>
+
+  <!-- ============ PROTOKOLL ============ -->
+  <section id="view-protokoll" class="view" aria-label="Protokoll">
+    <h2>Spielprotokoll</h2>
+    <ol id="log" class="log"></ol>
+    <div class="row two">
+      <button class="btn" data-act="undoLast">Letzten Eintrag löschen</button>
+      <button class="btn" data-act="addNote">Notiz hinzufügen</button>
+    </div>
+    <div class="row two">
+      <button class="btn primary" data-act="copyLog">Kopieren</button>
+      <button class="btn primary" data-act="shareLog">Teilen</button>
+    </div>
+    <button class="btn danger" data-act="newMatch">Neues Spiel starten</button>
+  </section>
+
+  <!-- ============ MEHR ============ -->
+  <section id="view-mehr" class="view" aria-label="Mehr">
+    <h2>Münzwurf</h2>
+    <div class="coinbox">
+      <button class="coin" id="coin" data-act="coin" aria-label="Münze werfen"><span id="coinFace">Werfen</span></button>
+      <p id="coinText" class="muted">Tippen zum Werfen. Kopf oder Zahl wird zufällig ausgewählt.</p>
+    </div>
+
+    <h2>Elfmeterschießen</h2>
+    <div class="pens">
+      <div class="pen-score"><span data-tn="0">Heim</span> <output id="penScore">0 : 0</output> <span data-tn="1">Gast</span></div>
+      <div class="pen-row"><span class="pen-name" data-tn="0">Heim</span><div class="dots" id="penDots0"></div></div>
+      <div class="pen-row"><span class="pen-name" data-tn="1">Gast</span><div class="dots" id="penDots1"></div></div>
+      <p class="muted" id="penTurn">Heim schießt.</p>
+      <div class="row two">
+        <button class="btn primary" data-act="penGoal">Getroffen</button>
+        <button class="btn" data-act="penMiss">Verschossen</button>
+      </div>
+      <div class="row two">
+        <button class="btn small" data-act="penUndo">Rückgängig</button>
+        <button class="btn small" data-act="penSave">Ins Protokoll</button>
+      </div>
+    </div>
+
+    <h2>Einstellungen</h2>
+    <div class="settings">
+      <label class="field"><span>Heim</span><input data-set="home" type="text" maxlength="24"></label>
+      <label class="field"><span>Gast</span><input data-set="away" type="text" maxlength="24"></label>
+      <label class="field"><span>Wettbewerb oder Spiel</span><input data-set="competition" type="text" maxlength="60" placeholder="z. B. Kreisliga A, Spieltag 7"></label>
+      <label class="field"><span>Schiedsrichter</span><input data-set="referee" type="text" maxlength="40"></label>
+      <div class="row two">
+        <label class="field"><span>Halbzeit in Minuten</span><input data-set="halfMin" type="number" min="1" max="60" step="1" inputmode="numeric"></label>
+        <label class="field"><span>Max. Wechsel</span><input data-set="maxSubs" type="number" min="0" max="15" step="1" inputmode="numeric"></label>
+      </div>
+      <label class="switch"><input data-set="extra" type="checkbox"><span>Verlängerung 2 × 15 Minuten möglich</span></label>
+      <label class="field"><span>Pfeifenklang</span>
+        <select data-set="whistle">
+          <option value="fox">Hell (Kunststoffpfeife)</option>
+          <option value="acme">Klassisch (Metallpfeife)</option>
+          <option value="deep">Tief (Hallenpfeife)</option>
+        </select>
+      </label>
+      <label class="field"><span>Lautstärke</span><input data-set="volume" type="range" min="0.1" max="1" step="0.05"></label>
+      <label class="switch"><input data-set="vibrate" type="checkbox"><span>Vibration bei Signalen</span></label>
+      <label class="switch"><input data-set="wake" type="checkbox"><span>Bildschirm während des Spiels anlassen</span></label>
+      <button class="btn" data-act="testWhistle">Pfeife testen</button>
+    </div>
+    <p class="muted small-print">Alle Daten bleiben nur auf diesem Gerät gespeichert.</p>
+  </section>
+
+</main>
+
+<nav class="tabbar" aria-label="Hauptnavigation">
+  <button data-tab="spiel" aria-selected="true">Spiel</button>
+  <button data-tab="karten" aria-selected="false">Karten</button>
+  <button data-tab="wechsel" aria-selected="false">Wechsel</button>
+  <button data-tab="protokoll" aria-selected="false">Protokoll</button>
+  <button data-tab="mehr" aria-selected="false">Mehr</button>
+</nav>
+
+<!-- Karten-Overlay -->
+<div id="flash" class="flash" hidden>
+  <div class="bigcard"><i class="c-y"></i><i class="c-r"></i></div>
+  <p id="flashLabel"></p>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
